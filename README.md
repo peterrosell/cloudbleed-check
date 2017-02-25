@@ -14,9 +14,26 @@ your password for that site. It doesn't take that much time to change it, just t
 Please also read the disclaimer here 
 https://github.com/pirate/sites-using-cloudflare
 
+### Parsing input data
+
+Each line in the file can contain one URL or one hostname. The match is only performed on 
+domain level that mean that if a hostname is provided with several subdomains they are 
+removed and only a domain name containing one dot (.) is used. An exception for domains 
+that ends with co.?? are handled special.  For example www.amazon.co.uk will be amazon.co.uk. 
+It might exist other special cases that are not handle correctly. 
+If you know about a special case, please open an issue.
+
+Example lines:
+
+    http://stackoverflow.com  -> stackoverflow.com
+    https://www.amazon.co.uk -> amazon.co.uk
+    https://sweden:8080 -> sweden
+    chrome.google.com -> google.com
+    
+
 ## Running
 
-The list of hostnames that you want to test is provided on stdin.
+The list of hostnames that you want to test is read from stdin. 
 
     cat mysites.txt | cloudbleed-check
 
