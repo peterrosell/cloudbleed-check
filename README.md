@@ -65,6 +65,14 @@ cat chrome_bookmarks.json | json_pp | sed 's/.*"url".*: "\(.*\)",/\1/;tx;d;:x' |
 
     cat history.json | sed 's/.*"url".*: "\(.*\)",/\1/;tx;d;:x' | cloudbleed-check
     
+#### Export from Chrome history database
+
+    echo "select url from urls;" | sqlite3 ~/.config/google-chrome/Default/History | \
+    cloudbleed-check
+    
+    echo "select url from urls;" | sqlite3 ~/.config/google-chrome/Default/History | \
+    docker run -i --rm peterrosell/cloudbleed-check:latest
+    
 ## Docker
 
 A public docker image is also available ```peterrosell/cloudbleed-check```.
