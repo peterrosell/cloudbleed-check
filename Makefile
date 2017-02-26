@@ -25,18 +25,19 @@ build-darwin-amd64:
 	$(call DIST_template,darwin,amd64)
 
 build-windows-386:
-	$(call DIST_template,windows,386)
+	$(call DIST_template,windows,386,.exe)
 
 build-windows-amd64:
-	$(call DIST_template,windows,amd64)
+	$(call DIST_template,windows,amd64,.exe)
 
 define DIST_template =
 	$(eval dist_os := $(1))
 	$(eval dist_arch := $(2))
+	$(eval file_ext := $(3))
 	$(eval dist_dir := dist/${dist_os}/${app_name}-${version}-${dist_os}-${dist_arch})
 	mkdir -p ${dist_dir}
 	cp README.md ${dist_dir}
-	CGO_ENABLED=0 GOOS=${dist_os} GOARCH=${dist_arch} go build -o ${dist_dir}/${app_name} -ldflags '-w'
+	CGO_ENABLED=0 GOOS=${dist_os} GOARCH=${dist_arch} go build -o ${dist_dir}/${app_name}${file_ext} -ldflags '-w'
 	mkdir -p ${release_dir}
 	cd ${dist_dir}/.. ; tar -czf ../../${release_dir}/${app_name}-${version}-${dist_os}-${dist_arch}.tar.gz ${app_name}-${version}-${dist_os}-${dist_arch}
 endef
