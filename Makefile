@@ -1,4 +1,4 @@
-version=0.2.0
+version=0.2.1
 app_name=cloudbleed-check
 release_dir=dist/releases
 build:
