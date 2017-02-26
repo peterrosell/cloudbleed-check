@@ -65,3 +65,18 @@ cat chrome_bookmarks.json | json_pp | sed 's/.*"url".*: "\(.*\)",/\1/;tx;d;:x' |
 
     cat history.json | sed 's/.*"url".*: "\(.*\)",/\1/;tx;d;:x' | cloudbleed-check
     
+## Docker
+
+A public docker image is also available ```peterrosell/cloudbleed-check```.
+
+Usage:
+
+    cat chrome_history.json | json_pp | sed 's/.*"url".*: "\(.*\)",/\1/;tx;d;:x' | \
+    docker run -i --rm peterrosell/cloudbleed-check:latest
+    
+#### Thanks to
+
+* [Kelsey Hightower](https://twitter.com/kelseyhightower) for the docker packaging solution including https support, see 
+https://github.com/kelseyhightower/contributors.
+* [Nick Sweeting](https://nicksweeting.com/) for collecting and managing the 
+[list of possible affected sites](https://github.com/pirate/sites-using-cloudflare).

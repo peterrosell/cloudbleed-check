@@ -12,24 +12,23 @@ import (
 	"regexp"
 	"sort"
 	"net/url"
+	"crypto/x509"
+	"crypto/tls"
 )
 
 const affectedSiteUrl = "https://raw.githubusercontent.com/pirate/sites-using-cloudflare/master/sorted_unique_cf.txt"
 
-var domainRegex = regexp.MustCompile(`.co\...$`)
-var verbose = false
-var debug = false
+var (
+	httpClient *http.Client
+	pool       *x509.CertPool
+
+	domainRegex = regexp.MustCompile(`.co\...$`)
+	verbose     = false
+	debug       = false
+)
 
 func main() {
 
-	if len(os.Args) > 1 {
-		if strings.Contains(os.Args[1], "v") {
-			verbose = true
-		}
-		if strings.Contains(os.Args[1], "d") {
-			debug = true
-		}
-	}
 
 	responseBody, err := openSiteStream(affectedSiteUrl)
 	if err != nil {
@@ -41,8 +40,31 @@ func main() {
 	CheckForMatchingSites(responseBody, os.Stdin, foundMatchOnAffectedSite)
 }
 
+func init() {
+	if len(os.Args) > 1 {
+		if strings.Contains(os.Args[1], "v") {
+			verbose = true
+		}
+		if strings.Contains(os.Args[1], "d") {
+			debug = true
+		}
+		if strings.Contains(os.Args[1], "c") {
+			pool = x509.NewCertPool()
+			pool.AppendCertsFromPEM(pemCerts)
+			httpClient = &http.Client{Transport: &http.Transport{TLSClientConfig: &tls.Config{RootCAs: pool}}}
+		}
+	}
+
+}
+
 func openSiteStream(url string) (io.ReadCloser, error) {
-	response, err := http.Get(url)
+	var response *http.Response
+	var err error
+	if httpClient != nil {
+		response, err = httpClient.Get(url)
+	} else {
+		response, err = http.Get(url)
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -168,5 +190,3 @@ func CheckForMatchingSites(affectedSitesReader io.Reader, sitesToCheckReader io.
 func foundMatchOnAffectedSite(site string) {
 	fmt.Println(site)
 }
-
-
